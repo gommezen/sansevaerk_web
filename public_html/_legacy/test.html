@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Karate Journal – Test</title>
+</head>
+<body>
+  <h1>Karate Journal – API test</h1>
+
+  <h2>Login</h2>
+  <input id="user" placeholder="brugernavn" />
+  <input id="pass" type="password" placeholder="password" />
+  <button id="btnLogin">Log ind</button>
+  <pre id="msg"></pre>
+
+  <hr />
+
+  <h2>Post session</h2>
+  <label>Dato (YYYY-MM-DD): <input id="date" value="2025-12-16" /></label><br/>
+  <label>Activity: <input id="activity" value="karate" /></label><br/>
+  <label>Duration: <input id="duration" type="number" value="60" /></label><br/>
+  <label>Energy (1-5): <input id="energy" type="number" value="4" /></label><br/>
+  <label>Emphasis: <input id="emphasis" value="technical" /></label><br/>
+  <label>Notes: <input id="notes" value="Test entry" /></label><br/>
+  <button id="btnPost">Send</button>
+
+  <hr />
+
+  <h2>Fetch sessions</h2>
+  <button id="btnGet">Hent</button>
+  <pre id="out"></pre>
+
+  <script src="test.js"></script>
+</body>
+</html>

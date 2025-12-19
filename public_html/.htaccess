@@ -1,0 +1,18 @@
+# ----------------------------------------------------------------------
+# Security hardening
+# ----------------------------------------------------------------------
+
+# Deny direct access to internal helpers
+<Files "_common.php">
+  Require all denied
+</Files>
+
+# Deny access to dotfiles
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# Prevent caching of API responses
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store"
+</IfModule>

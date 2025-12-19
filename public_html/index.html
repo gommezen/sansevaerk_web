@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Karate Training Journal</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>Karate Training Journal</h1>
+      <p class="sub">Log. Reflect. Improve.</p>
+    </header>
+
+    <section id="loginCard" class="card">
+      <h2>Login</h2>
+      <div class="row">
+        <input id="user" placeholder="brugernavn" autocomplete="username" />
+        <input id="pass" type="password" placeholder="password" autocomplete="current-password" />
+      </div>
+      <button id="btnLogin" type="button">Log ind</button>
+      <p id="loginMsg" class="msg"></p>
+    </section>
+
+    <section id="appCard" class="card" hidden>
+      <div class="topbar">
+        <h2>Log session</h2>
+        <button id="btnLogout" type="button" class="ghost">Log ud</button>
+      </div>
+
+      <div class="grid">
+        <label>
+          Date
+          <input id="date" type="date" />
+        </label>
+
+        <label>
+          Activity
+          <select id="activity">
+            <option>karate</option>
+            <option>weights</option>
+            <option>run</option>
+            <option>rowing</option>
+            <option>cardio</option>
+            <option>rest</option>
+          </select>
+        </label>
+
+        <label>
+          Duration (min)
+          <input id="duration" type="number" min="0" max="300" step="5" value="60" />
+        </label>
+
+        <label>
+          Energy (1–5)
+          <input id="energy" type="number" min="1" max="5" value="4" />
+        </label>
+
+        <label>
+          Emphasis
+          <select id="emphasis">
+            <option>technical</option>
+            <option>physical</option>
+            <option>mixed</option>
+          </select>
+        </label>
+
+        <label class="wide">
+          Notes
+          <input id="notes" placeholder="Timing off, good snap..." />
+        </label>
+      </div>
+
+      <button id="btnSave" type="button">Save session</button>
+      <p id="saveMsg" class="msg"></p>
+
+      <hr />
+
+      <div class="topbar">
+        <h2>Recent sessions</h2>
+        <button id="btnRefresh" type="button" class="ghost">Refresh</button>
+      </div>
+      <div id="list"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
