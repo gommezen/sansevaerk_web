@@ -53,19 +53,53 @@ function renderList(items) {
   // 2) Take only last 5
   const recent = sorted.slice(0, 5);
 
-  // 3) Render ONLY those 5
+  // 3) Render ONLY those 5 (with delete button)
   listEl.innerHTML = recent.map(x => `
-    <div class="item">
+    <div class="item sessionItem">
       <div class="itemTop">
         <div><b>${x.session_date}</b> — ${x.activity_type}</div>
-        <div class="pill">${x.duration_minutes}m · E${x.energy_level} · ${x.session_emphasis}</div>
+
+        <div class="pillStack">
+          <div class="pill">
+            ${x.duration_minutes}m · E${x.energy_level} · ${x.session_emphasis}
+          </div>
+
+          <button
+            class="pill pillDelete"
+            data-uuid="${x.uuid}"
+            title="Delete session"
+          >
+            Delete
+          </button>
+        </div>
       </div>
+
+
       <div class="notes">
         ${x.notes ? escapeHtml(x.notes) : "<span class='muted'>No notes</span>"}
       </div>
     </div>
   `).join("");
+
+  // 4) Attach delete handlers
+  listEl.querySelectorAll(".pillDelete").forEach(btn => {
+    btn.onclick = async () => {
+      const uuid = btn.dataset.uuid;
+      if (!confirm("Delete this session?")) return;
+
+      try {
+        await api("/api/sessions.php", {
+          method: "DELETE",
+          body: JSON.stringify({ uuid })
+        });
+        await refresh();
+      } catch {
+        alert("Could not delete session.");
+      }
+    };
+  });
 }
+
 
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));

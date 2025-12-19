@@ -174,6 +174,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 /* ----------------------------------------------------------------------
+   DELETE — soft delete session by uuid
+   ---------------------------------------------------------------------- */
+
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    $b = json_body();
+    $uuid = (string)($b['uuid'] ?? '');
+
+    if (!preg_match('/^[a-f0-9-]{36}$/i', $uuid)) {
+        respond(['error' => 'invalid uuid'], 400);
+    }
+
+    $stmt = $db->prepare("
+        UPDATE training_sessions
+        SET deleted = 1, updated_at = CURRENT_TIMESTAMP
+        WHERE uuid = ? AND deleted = 0
+    ");
+    $stmt->execute([$uuid]);
+
+    if ($stmt->rowCount() === 0) {
+        respond(['error' => 'not found'], 404);
+    }
+
+    respond(['ok' => true]);
+
+}
+
+
+/* ----------------------------------------------------------------------
    Fallback
    ---------------------------------------------------------------------- */
 
