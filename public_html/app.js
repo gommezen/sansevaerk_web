@@ -36,6 +36,81 @@ function showApp(isAuthed) {
   el("appCard").hidden = !isAuthed;
 }
 
+// Load selected day overview
+async function loadDayView() {
+  const input = el("dayDate");
+  if (!input || !input.value) return;
+
+  // Normalize to YYYY-MM-DD regardless of locale
+  const isoDate = input.valueAsDate
+    ? input.valueAsDate.toISOString().slice(0, 10)
+    : input.value;
+
+  try {
+    const items = await api(`/api/sessions.php?date=${isoDate}`);
+    renderDayList(items);
+  } catch {
+    el("dayList").innerHTML = "<p class='muted'>Could not load day.</p>";
+  }
+}
+
+
+//render day view
+function renderDayList(items) {
+  const elDay = el("dayList");
+  elDay.innerHTML = "";
+
+  if (!items || !items.length) {
+    elDay.innerHTML = "<p class='muted'>No sessions this day.</p>";
+    return;
+  }
+
+  elDay.innerHTML = items.map(x => `
+    <div class="item">
+      <div class="itemTop">
+        <div><b>${x.activity_type}</b></div>
+
+        <div class="pillStack">
+          <div class="pill">
+            ${x.duration_minutes}m · E${x.energy_level} · ${x.session_emphasis}
+          </div>
+
+          <button
+            class="pill pillDelete"
+            data-uuid="${x.uuid}"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <div class="notes">
+        ${x.notes ? escapeHtml(x.notes) : "<span class='muted'>No notes</span>"}
+      </div>
+    </div>
+  `).join("");
+
+  // attach delete handlers (same logic as before)
+  elDay.querySelectorAll(".pillDelete").forEach(btn => {
+    btn.onclick = async () => {
+      const uuid = btn.dataset.uuid;
+      if (!confirm("Delete this session?")) return;
+
+      try {
+        await api("/api/sessions.php", {
+          method: "DELETE",
+          body: JSON.stringify({ uuid })
+        });
+        await loadDayView();   // refresh day
+        await refresh();       // refresh recent
+      } catch {
+        alert("Could not delete session.");
+      }
+    };
+  });
+}
+
+
 function renderList(items) {
   const listEl = el("list");
   listEl.innerHTML = "";
@@ -196,19 +271,43 @@ el("btnSave").onclick = async () => {
 
 el("btnRefresh").onclick = refresh;
 
+el("btnDayView").onclick = loadDayView;
+
+
 // --------------------------------------------------
 // Initial auth check on page load
 // --------------------------------------------------
+
+// (async () => {
+//   const authed = await verifyAuth();
+//   showApp(authed);
+
+//   if (authed) {
+//     el("date").value = new Date().toISOString().slice(0, 10);
+//     await refresh();
+//   }
+// })();
 
 (async () => {
   const authed = await verifyAuth();
   showApp(authed);
 
   if (authed) {
-    el("date").value = new Date().toISOString().slice(0, 10);
+    const today = new Date().toISOString().slice(0, 10);
+
+    // set form date
+    el("date").value = today;
+
+    // set day overview date
+    el("dayDate").value = today;
+
+    // load data
     await refresh();
+    await loadDayView();
   }
 })();
+
+
 
 // Start state (ikke authed før login)
 // showApp(false);

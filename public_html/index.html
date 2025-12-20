@@ -1,16 +1,18 @@
 <!doctype html>
 <html lang="da">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Karate Training Journal</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <main class="wrap">
     <header>
       <h1>Karate Training Journal</h1>
-      <p class="sub">Log. Reflect. Improve.</p>
+      <p class="sub">Daily notes. Reflections. Improvements</p>
     </header>
 
     <section id="loginCard" class="card">
@@ -77,6 +79,20 @@
 
       <hr />
 
+      <!-- Day overview -->
+      <div class="topbar">
+        <h2>Day overview</h2>
+      </div>
+
+      <div class="dayOverview">
+        <input type="date" id="dayDate" />
+        <button id="btnDayView" type="button" class="ghost">View day</button>
+
+        <div id="dayList"></div>
+      </div>
+
+      <!-- Recent sessions -->
+
       <div class="topbar">
         <h2>Recent sessions</h2>
         <button id="btnRefresh" type="button" class="ghost">Refresh</button>
@@ -87,4 +103,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>

@@ -25,9 +25,25 @@ $db = pdo();
    ---------------------------------------------------------------------- */
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $date  = isset($_GET['date'])  ? (string)$_GET['date']  : '';
     $since = isset($_GET['since']) ? (string)$_GET['since'] : '';
 
-    // Incremental sync
+    // 1) Day overview (explicit user intent)
+    if ($date !== '' && is_iso_date($date)) {
+        $stmt = $db->prepare("
+            SELECT
+              id, session_date, activity_type, duration_minutes,
+              energy_level, session_emphasis, notes, uuid, deleted, updated_at
+            FROM training_sessions
+            WHERE session_date = ?
+              AND deleted = 0
+            ORDER BY id DESC
+        ");
+        $stmt->execute([$date]);
+        respond($stmt->fetchAll());
+    }
+
+    // 2) Incremental sync (Streamlit)
     if ($since !== '') {
         $stmt = $db->prepare("
             SELECT
@@ -42,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         respond($stmt->fetchAll());
     }
 
-    // Default: latest visible sessions
+    // 3) Default: recent sessions
     $stmt = $db->query("
         SELECT
           id, session_date, activity_type, duration_minutes,
