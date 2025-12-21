@@ -2,26 +2,24 @@
 
 A personal training journal designed for daily use, reliability, and long-term continuity.
 
+## Overview
 The system supports logging, reviewing, and maintaining training sessions across days and weeks, with a strong focus on correctness, safety, and offline compatibility. It is intentionally minimal in scope, single-user by design, and optimized for habitual use rather than social or competitive features.
 
-## Purpose
+## Core capabilities include:
 
-A single-user, authenticated training journal built to function as a durable personal record rather than a social platform.
-
-Core capabilities include:
-
-- Session-based authentication
-- Day- and time-based querying
-- Safe, UUID-based soft deletion
+- Authenticated, session-based API
+- Creation, editing, and soft deletion of training sessions
+- Day-based and recent session views
+- UUID-based session identity
 - Incremental offline/online synchronization
-- Mobile-first daily usage
+- Mobile-first interaction model
 
-## System design
+## System design principles
 
 The journal is built around a small, explicit core:
 
-- Authenticated API surface with centralized guards
-- Deterministic data access patterns
+- Centralized authentication and request guarding
+- Deterministic data access and update paths
 - Non-destructive data operations by default
 - Clear separation between infrastructure, API logic, and UI behavior
 
@@ -30,10 +28,10 @@ The system favors predictability and safety over feature breadth, making it easy
 ## API characteristics
 
 - Authentication required for all mutating operations
-- Deterministic query precedence (day → incremental sync → recent)
+- Explicit query precedence: day → incremental sync → recent
 - Soft-delete semantics (idempotent and sync-safe)
-- Locale-safe date handling
-- Defensive defaults and explicit empty-state responses
+- Strict validation of dates, identifiers, and input ranges
+- Explicit empty-state responses rather than implicit failure
 
 ## Frontend behavior
 

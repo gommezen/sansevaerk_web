@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     // 2) Incremental sync (Streamlit)
-    if ($since !== '') {
+    if ($since !== '' && is_iso_date) {
         $stmt = $db->prepare("
             SELECT
               id, session_date, activity_type, duration_minutes,
@@ -85,20 +85,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($b['items']) && is_array($b['items'])) {
         $stmt = $db->prepare("
             INSERT INTO training_sessions
-              (session_date, activity_type, duration_minutes, energy_level,
-               session_emphasis, notes, uuid, deleted)
+            (session_date, activity_type, duration_minutes, energy_level,
+            session_emphasis, notes, uuid, deleted)
             VALUES
-              (?, ?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, 0)
             ON DUPLICATE KEY UPDATE
-              session_date=VALUES(session_date),
-              activity_type=VALUES(activity_type),
-              duration_minutes=VALUES(duration_minutes),
-              energy_level=VALUES(energy_level),
-              session_emphasis=VALUES(session_emphasis),
-              notes=VALUES(notes),
-              deleted=VALUES(deleted),
-              updated_at=CURRENT_TIMESTAMP
+            session_date=VALUES(session_date),
+            activity_type=VALUES(activity_type),
+            duration_minutes=VALUES(duration_minutes),
+            energy_level=VALUES(energy_level),
+            session_emphasis=VALUES(session_emphasis),
+            notes=VALUES(notes),
+            deleted=0,
+            updated_at=CURRENT_TIMESTAMP
         ");
+
+
 
         $count = 0;
 
@@ -169,12 +171,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Explicitly set deleted = 0 so the row is visible
+    // Insert new OR update existing (edit mode uses same uuid)
     $stmt = $db->prepare("
         INSERT INTO training_sessions
-          (session_date, activity_type, duration_minutes, energy_level,
-           session_emphasis, notes, uuid, deleted)
+        (session_date, activity_type, duration_minutes, energy_level,
+        session_emphasis, notes, uuid, deleted)
         VALUES
-          (?, ?, ?, ?, ?, ?, ?, 0)
+        (?, ?, ?, ?, ?, ?, ?, 0)
+        ON DUPLICATE KEY UPDATE
+        session_date=VALUES(session_date),
+        activity_type=VALUES(activity_type),
+        duration_minutes=VALUES(duration_minutes),
+        energy_level=VALUES(energy_level),
+        session_emphasis=VALUES(session_emphasis),
+        notes=VALUES(notes),
+        deleted=0,
+        updated_at=CURRENT_TIMESTAMP
     ");
     $stmt->execute([
         $session_date,
@@ -186,8 +198,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $uuid
     ]);
 
-    respond(['ok' => true, 'id' => $db->lastInsertId()]);
+    respond(['ok' => true]);
 }
+
 
 /* ----------------------------------------------------------------------
    DELETE — soft delete session by uuid
