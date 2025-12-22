@@ -12,8 +12,15 @@
   <main class="wrap">
     <header>
       <h1>Karate Training Journal</h1>
-      <p class="sub">Daily notes. Reflections. Improvements</p>
+
+      <div class="headerRow">
+        <p class="sub">Daily notes. Reflections. Improvements</p>
+        <button type="button" class="ghost themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+          🌓
+        </button>
+      </div>
     </header>
+
 
     <section id="loginCard" class="card">
       <h2>Login</h2>
@@ -30,6 +37,8 @@
         <h2>Log session</h2>
         <button id="btnLogout" type="button" class="ghost">Log ud</button>
       </div>
+
+
 
       <div class="grid">
         <label>
@@ -56,7 +65,13 @@
 
         <label>
           Energy (1–5)
-          <input id="energy" type="number" min="1" max="5" value="4" />
+          <select id="energy">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+          </select>
         </label>
 
         <label>

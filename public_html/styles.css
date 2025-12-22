@@ -9,8 +9,11 @@
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   margin: 0;
-  background: #f6f7fb;
+  background: var(--bg);
+  color: var(--text);
 }
+
+
 
 .wrap {
   max-width: 920px;
@@ -22,9 +25,34 @@ header {
   margin-bottom: 16px;
 }
 
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.themeToggle {
+  padding: 6px 10px;
+  font-size: 16px;
+}
+
+
 .sub {
   margin-top: 4px;
   color: #555;
+}
+
+/* darkmode */
+:root {
+  --bg: #f6f7fb;
+  --card-bg: #ffffff;
+  --text: #111;
+  --muted: #4c4a4a;
+  --border: #e5e5e5;
+  --pill-bg: #f2f3f7;
+  --btn-bg: #111;
+  --btn-text: #fff;
 }
 
 /* =====================================================
@@ -32,11 +60,12 @@ header {
    ===================================================== */
 
 .card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 14px;
   padding: 16px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
 }
+
 
 /* =====================================================
    Form layout
@@ -89,12 +118,12 @@ button {
   padding: 10px 14px;
   border: 0;
   border-radius: 10px;
-  background: #111;
-  color: #fff;
+  background: var(--btn-bg);
+  color: var(--btn-text);
   font-size: 14px;
   cursor: pointer;
-
 }
+
 
 button.ghost {
   background: transparent;
@@ -123,7 +152,7 @@ button.ghost {
 }
 
 .pillDelete:hover {
-  background: #941936;
+  background: #de6d93;
 }
 
 
@@ -168,12 +197,13 @@ hr {
 
 .pill {
   font-size: 12px;
-  color: #333;
-  background: #f2f3f7;
+  color: var(--text);
+  background: var(--pill-bg);
   padding: 6px 10px;
   border-radius: 999px;
   white-space: nowrap;
 }
+
 
 .notes {
   margin-top: 8px;
@@ -181,7 +211,46 @@ hr {
 }
 
 .muted {
-  color: #666;
+  color: var(--muted);
+}
+
+
+/* --- RPE (Perceived Effort) --- */
+
+.rpeRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0 8px;
+}
+
+.rpeScale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rpeBtn {
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #f6f6f6;
+  color: #333;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rpeBtn:hover {
+  background: #eaeaea;
+}
+
+.rpeBtn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
 }
 
 /* =========================================
@@ -214,8 +283,19 @@ hr {
     margin-bottom: 22px;
   }
 
+  /* Default: action buttons are full width */
   button {
     width: 100%;
+  }
+
+  /* RPE buttons opt out of full-width behavior */
+  button.rpeBtn {
+    width: auto;
+  }
+
+  /* Keep RPE scale left-aligned */
+  .rpeScale {
+    justify-content: flex-start;
   }
 }
 
@@ -236,4 +316,24 @@ button.ghost:active {
 button:focus-visible {
   outline: 2px solid #111;
   outline-offset: 2px;
+}
+
+[data-theme="dark"] {
+  --bg: #0f1115;
+  --card-bg: #171a21;
+  --text: #07c92f;
+  --muted: #9aa0a6;
+  --border: #2a2f3a;
+  --pill-bg: #222633;
+  --btn-bg: #e6e6e6;
+  --btn-text: #111;
+}
+
+[data-theme="dark"] .muted {
+  color: #b0b6c0;
+}
+
+[data-theme="dark"] button.ghost {
+  color: var(--text);
+  border-color: var(--border);
 }

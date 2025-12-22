@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $db->prepare("
             SELECT
               id, session_date, activity_type, duration_minutes,
-              energy_level, session_emphasis, notes, uuid, deleted, updated_at
+              energy_level, session_emphasis, rpe, notes, uuid, deleted, updated_at
             FROM training_sessions
             WHERE session_date = ?
               AND deleted = 0
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $db->prepare("
             SELECT
               id, session_date, activity_type, duration_minutes,
-              energy_level, session_emphasis, notes, uuid, deleted, updated_at
+              energy_level, session_emphasis, rpe, notes, uuid, deleted, updated_at
             FROM training_sessions
             WHERE updated_at > ?
             ORDER BY updated_at ASC
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $db->query("
         SELECT
           id, session_date, activity_type, duration_minutes,
-          energy_level, session_emphasis, notes, uuid, deleted, updated_at
+          energy_level, session_emphasis, rpe, notes, uuid, deleted, updated_at
         FROM training_sessions
         WHERE deleted = 0
         ORDER BY session_date DESC, id DESC
@@ -95,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             duration_minutes=VALUES(duration_minutes),
             energy_level=VALUES(energy_level),
             session_emphasis=VALUES(session_emphasis),
+            rpe=VALUES(rpe),
             notes=VALUES(notes),
             deleted=0,
             updated_at=CURRENT_TIMESTAMP
@@ -112,12 +113,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $duration_minutes = (int)($it['duration_minutes'] ?? -1);
             $energy_level     = (int)($it['energy_level'] ?? 0);
             $session_emphasis = (string)($it['session_emphasis'] ?? '');
+            $rpe = array_key_exists('rpe', $it) ? (int)$it['rpe'] : null;
             $notes            = array_key_exists('notes', $it) ? (string)$it['notes'] : null;
             $uuid             = (string)($it['uuid'] ?? '');
             $deleted          = (int)($it['deleted'] ?? 0);
 
             if (!is_iso_date($session_date)) continue;
             if ($activity_type === '' || $session_emphasis === '') continue;
+            if ($rpe !== null && ($rpe < 1 || $rpe > 10)) continue;
             if ($duration_minutes < 0 || $duration_minutes > 300) continue;
             if ($energy_level < 1 || $energy_level > 5) continue;
             if (!preg_match('/^[a-f0-9-]{36}$/i', $uuid)) continue;
@@ -128,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $duration_minutes,
                 $energy_level,
                 $session_emphasis,
+                $rpe,
                 $notes,
                 $uuid,
                 $deleted
@@ -148,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $duration_minutes = (int)($b['duration_minutes'] ?? -1);
     $energy_level     = (int)($b['energy_level'] ?? 0);
     $session_emphasis = (string)($b['session_emphasis'] ?? '');
+    $rpe = array_key_exists('rpe', $b) ? (int)$b['rpe'] : null;
     $notes            = array_key_exists('notes', $b) ? (string)$b['notes'] : null;
     $uuid             = (string)($b['uuid'] ?? '');
 
@@ -166,6 +171,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($session_emphasis === '') {
         respond(['error' => 'session_emphasis required'], 400);
     }
+    if ($rpe !== null && ($rpe < 1 || $rpe > 10)) {
+        respond(['error' => 'rpe must be 1–10 or null'], 400);
+    }
     if (!preg_match('/^[a-f0-9-]{36}$/i', $uuid)) {
         respond(['error' => 'uuid required (36 chars)'], 400);
     }
@@ -175,25 +183,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $db->prepare("
         INSERT INTO training_sessions
         (session_date, activity_type, duration_minutes, energy_level,
-        session_emphasis, notes, uuid, deleted)
+        session_emphasis, rpe, notes, uuid, deleted)
         VALUES
-        (?, ?, ?, ?, ?, ?, ?, 0)
+        (?, ?, ?, ?, ?, ?, ?, ?, 0)
         ON DUPLICATE KEY UPDATE
         session_date=VALUES(session_date),
         activity_type=VALUES(activity_type),
         duration_minutes=VALUES(duration_minutes),
         energy_level=VALUES(energy_level),
         session_emphasis=VALUES(session_emphasis),
+        rpe=VALUES(rpe),
         notes=VALUES(notes),
         deleted=0,
         updated_at=CURRENT_TIMESTAMP
     ");
+
     $stmt->execute([
         $session_date,
         $activity_type,
         $duration_minutes,
         $energy_level,
         $session_emphasis,
+        $rpe,
         $notes,
         $uuid
     ]);
