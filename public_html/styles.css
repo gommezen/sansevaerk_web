@@ -14,12 +14,19 @@ body {
 }
 
 
-
 .wrap {
   max-width: 920px;
   margin: 0 auto;
   padding: 24px;
 }
+
+.dayControls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
 
 header {
   margin-bottom: 16px;
@@ -207,14 +214,6 @@ hr {
   gap: 10px;
 }
 
-/* .item {
-  padding: 12px;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  margin: 10px 0;
-  background: #fff;
-} */
-
 .item {
   padding: 12px;
   border: 1px solid var(--border);
@@ -229,6 +228,13 @@ hr {
   gap: 10px;
   align-items: center;
 }
+
+.item.editing {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 
 .pill {
   font-size: 12px;
