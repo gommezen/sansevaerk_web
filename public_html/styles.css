@@ -40,19 +40,26 @@ header {
 
 .sub {
   margin-top: 4px;
-  color: #555;
+  color: var(--muted);
 }
 
 /* darkmode */
 :root {
   --bg: #f6f7fb;
   --card-bg: #ffffff;
+  --input-bg: #ffffff;
   --text: #111;
   --muted: #4c4a4a;
   --border: #e5e5e5;
   --pill-bg: #f2f3f7;
   --btn-bg: #111;
   --btn-text: #fff;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--accent);
 }
 
 /* =====================================================
@@ -98,8 +105,9 @@ header {
    Inputs — let the browser handle height
    ===================================================== */
 
-input,
-select {
+/* input,
+select,
+textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ddd;
@@ -108,7 +116,25 @@ select {
   line-height: 1.4;
   appearance: none;
   -webkit-appearance: none;
+} */
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  background: var(--input-bg);
+  color: var(--text);
 }
+
+::placeholder {
+  color: var(--muted);
+}
+
 
 /* =====================================================
    Buttons
@@ -127,9 +153,10 @@ button {
 
 button.ghost {
   background: transparent;
-  color: #111;
-  border: 1px solid #ddd;
+  color: var(--text);
+  border: 1px solid var(--border);
 }
+
 
 /* =====================================================
    Pill stack (summary + delete)
@@ -169,7 +196,7 @@ button.ghost {
 
 hr {
   border: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border);
   margin: 16px 0;
 }
 
@@ -180,12 +207,20 @@ hr {
   gap: 10px;
 }
 
-.item {
+/* .item {
   padding: 12px;
   border: 1px solid #eee;
   border-radius: 12px;
   margin: 10px 0;
   background: #fff;
+} */
+
+.item {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 10px 0;
+  background: var(--card-bg);
 }
 
 .itemTop {
@@ -207,15 +242,16 @@ hr {
 
 .notes {
   margin-top: 8px;
-  color: #222;
+  color: var(--text);
 }
 
 .muted {
   color: var(--muted);
 }
 
-
-/* --- RPE (Perceived Effort) --- */
+/* =====================================================
+   RPE (Perceived Effort) component
+   ===================================================== */
 
 .rpeRow {
   display: flex;
@@ -235,13 +271,14 @@ hr {
   height: 28px;
   padding: 0;
   border-radius: 8px;
-  border: 1px solid #ddd;
-  background: #f6f6f6;
-  color: #333;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
   font-size: 12px;
   line-height: 1;
   cursor: pointer;
 }
+
 
 .rpeBtn:hover {
   background: #eaeaea;
@@ -265,6 +302,12 @@ hr {
 /* =====================================================
    Mobile breakpoint — simple & predictable
    ===================================================== */
+
+.btnPrimary {
+  width: auto;
+  min-width: 160px;
+}
+
 
 @media (max-width: 620px) {
   .wrap {
@@ -291,6 +334,11 @@ hr {
   /* RPE buttons opt out of full-width behavior */
   button.rpeBtn {
     width: auto;
+  }
+
+  button.btnPrimary {
+    width: auto;
+    align-self: flex-start;
   }
 
   /* Keep RPE scale left-aligned */
@@ -321,7 +369,9 @@ button:focus-visible {
 [data-theme="dark"] {
   --bg: #0f1115;
   --card-bg: #171a21;
-  --text: #07c92f;
+  --input-bg: #1f2430;
+  --accent: #07c92f;
+  --text: #e6e6e6;
   --muted: #9aa0a6;
   --border: #2a2f3a;
   --pill-bg: #222633;
