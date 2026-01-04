@@ -86,9 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $db->prepare("
             INSERT INTO training_sessions
             (session_date, activity_type, duration_minutes, energy_level,
-            session_emphasis, notes, uuid, deleted)
+            session_emphasis, rpe, notes, uuid, deleted)
             VALUES
-            (?, ?, ?, ?, ?, ?, ?, 0)
+            (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
             session_date=VALUES(session_date),
             activity_type=VALUES(activity_type),
