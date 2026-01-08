@@ -1,55 +1,73 @@
 # sansevaerk
 
-A personal training journal designed for daily use, reliability, and long-term continuity.
+Sansevaerk is a minimal, single-user personal training journal (PHP + simple frontend) focused on daily logging, reliable offline/online synchronization, and long-term data continuity.
 
-## Overview
-The system supports logging, reviewing, and maintaining training sessions across days and weeks, with a strong focus on correctness, safety, and offline compatibility. It is intentionally minimal in scope, single-user by design, and optimized for habitual use rather than social or competitive features.
+## Quick Start
 
-## Core capabilities include:
+1. Copy the example config and edit required values:
+
+```bash
+# Unix / Git Bash
+cp private_journal/config.example.php private_journal/config.php
+
+# PowerShell (Windows)
+Copy-Item private_journal\config.example.php private_journal\config.php
+
+# Edit private_journal/config.php and set DB and secret values
+```
+
+2. Start a development server:
+
+```bash
+php -S localhost:8000 -t public_html
+# Open http://localhost:8000 in your browser
+```
+
+## Requirements
+
+- PHP 7.4+  
+- MySQL/MariaDB database  
+- A modern browser
+
+
+## Configuration
+
+- Copy `private_journal/config.example.php` → `private_journal/config.php` and fill in real values.
+- Fields present in the example:
+
+  - `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS` — database connection
+  - `APP_USER` — login username for the single-user system
+  - `APP_PASS_HASH` — password hash generated with `password_hash()`
+  - `SYNC_TOKEN` — shared secret for sync/authenticated sync endpoints
+
+- Important: `private_journal/config.php` contains secrets and must NEVER be committed to version control.
+
+## Usage / API
+
+See `public_html/api/` for endpoint implementations and parameter definitions.
+
+## Features
 
 - Authenticated, session-based API
-- Creation, editing, and soft deletion of training sessions
+- Create, edit, and soft-delete training sessions
 - Day-based and recent session views
-- UUID-based session identity
-- Incremental offline/online synchronization
-- Mobile-first interaction model
+- UUID-based session identities
+- Incremental offline/online sync
+- Mobile-first UI model
 
-## System design principles
-
-The journal is built around a small, explicit core:
+## Architecture & Design Principles
 
 - Centralized authentication and request guarding
 - Deterministic data access and update paths
-- Non-destructive data operations by default
-- Clear separation between infrastructure, API logic, and UI behavior
+- Non-destructive operations by default (soft delete)
+- Clear separation of infrastructure, API logic, and UI behavior
 
-The system favors predictability and safety over feature breadth, making it easy to extend without destabilizing existing functionality.
+Refer to the `api/` folder for endpoint implementations and `public_html/` for frontend assets.
 
-## API characteristics
+## Development
 
-- Authentication required for all mutating operations
-- Explicit query precedence: day → incremental sync → recent
-- Soft-delete semantics (idempotent and sync-safe)
-- Strict validation of dates, identifiers, and input ranges
-- Explicit empty-state responses rather than implicit failure
-
-## Frontend behavior
-
-- Mobile-first interface intended for frequent, short interactions
-- Day and recent views kept in sync after mutations
-- Immediate feedback on create and delete actions
-- Graceful handling of expired sessions and empty states
-
-## Security posture
-
-Appropriate for a single-user personal system:
-
-- HttpOnly session cookies
-- Server-side validation on all inputs
-- UUID-based identifiers
-- Non-destructive deletes
-- No secrets committed to version control
-
-Further hardening is possible, but the current level is intentional and sufficient for the intended scope.
-
----
+- Recommended local workflow:
+  - Copy and edit `private_journal/config.example.php` → `private_journal/config.php`
+  - Run the built-in server for quick iteration
+- Add tests and linters as needed (not currently included)
+- Keep secrets out of source control
