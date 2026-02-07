@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sansevaerk Frontend Playground</title>
+<style>
+/* ---- Playground chrome ---- */
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#111318;color:#ccc;display:flex;height:100vh;overflow:hidden}
+
+/* ---- Left panel: controls ---- */
+.controls{width:340px;min-width:340px;background:#161920;border-right:1px solid #2a2f3a;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:6px}
+.controls h1{font-size:15px;color:#07c92f;margin-bottom:4px}
+.controls h2{font-size:12px;color:#9aa0a6;text-transform:uppercase;letter-spacing:.8px;margin:12px 0 4px;padding-top:10px;border-top:1px solid #2a2f3a}
+.controls h2:first-of-type{border-top:none;margin-top:6px}
+
+.ctrl{display:flex;align-items:center;gap:8px;font-size:12px;min-height:28px}
+.ctrl label{flex:0 0 110px;color:#9aa0a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctrl input[type=range]{flex:1;accent-color:#07c92f;height:4px}
+.ctrl input[type=color]{width:32px;height:24px;border:1px solid #2a2f3a;border-radius:4px;background:transparent;cursor:pointer;padding:0}
+.ctrl input[type=color]::-webkit-color-swatch-wrapper{padding:1px}
+.ctrl input[type=color]::-webkit-color-swatch{border:none;border-radius:3px}
+.ctrl select{flex:1;background:#1f2430;color:#ccc;border:1px solid #2a2f3a;border-radius:4px;padding:2px 4px;font-size:12px}
+.ctrl .val{min-width:36px;text-align:right;color:#07c92f;font-family:monospace;font-size:11px}
+
+/* Presets */
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.presets button{padding:4px 10px;border:1px solid #2a2f3a;border-radius:6px;background:#1f2430;color:#ccc;font-size:11px;cursor:pointer;transition:all .15s}
+.presets button:hover{border-color:#07c92f;color:#07c92f}
+.presets button.active{background:#07c92f;color:#111;border-color:#07c92f}
+
+/* ---- Right panel ---- */
+.right{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Preview area */
+.preview-wrap{flex:1;overflow-y:auto;padding:24px;display:flex;justify-content:center}
+.preview-frame{width:100%;max-width:920px}
+
+/* Prompt output */
+.prompt-area{background:#0d0f13;border-top:1px solid #2a2f3a;padding:12px 16px;display:flex;flex-direction:column;gap:8px;max-height:220px}
+.prompt-area h3{font-size:11px;color:#9aa0a6;text-transform:uppercase;letter-spacing:.6px}
+.prompt-text{font-family:'SF Mono',Consolas,monospace;font-size:12px;color:#ccc;line-height:1.5;white-space:pre-wrap;overflow-y:auto;max-height:140px;padding:8px;background:#161920;border-radius:6px;border:1px solid #2a2f3a}
+.copy-btn{align-self:flex-end;padding:5px 14px;border:1px solid #2a2f3a;border-radius:6px;background:#1f2430;color:#ccc;font-size:11px;cursor:pointer;transition:all .15s}
+.copy-btn:hover{border-color:#07c92f;color:#07c92f}
+.copy-btn.copied{background:#07c92f;color:#111;border-color:#07c92f}
+
+/* ---- Preview content (mirrors Sansevaerk styles) ---- */
+.sv-wrap{margin:0 auto;font-family:var(--sv-font)}
+.sv-wrap *{box-sizing:border-box}
+.sv-header{margin-bottom:16px}
+.sv-headerRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sv-sub{margin-top:4px;color:var(--sv-muted)}
+.sv-themeToggle{padding:6px 10px;font-size:16px}
+.sv-card{background:var(--sv-card-bg);border-radius:var(--sv-card-radius);padding:var(--sv-card-padding);box-shadow:var(--sv-shadow)}
+.sv-row{display:flex;gap:10px;align-items:stretch}
+.sv-grid{display:grid;gap:var(--sv-grid-gap);grid-template-columns:repeat(2,minmax(0,1fr));margin:10px 0 12px}
+.sv-grid label{display:grid;gap:6px;font-size:14px}
+.sv-grid .wide{grid-column:1/-1}
+.sv-wrap input,.sv-wrap select,.sv-wrap textarea{width:100%;padding:var(--sv-input-padding);border:1px solid var(--sv-border);border-radius:var(--sv-input-radius);font-size:14px;line-height:1.4;background:var(--sv-input-bg);color:var(--sv-text);font-family:var(--sv-font)}
+.sv-wrap input::placeholder{color:var(--sv-muted)}
+.sv-wrap button{padding:10px 14px;border:0;border-radius:var(--sv-btn-radius);background:var(--sv-btn-bg);color:var(--sv-btn-text);font-size:14px;cursor:pointer;font-family:var(--sv-font)}
+.sv-wrap button.ghost{background:transparent;color:var(--sv-text);border:1px solid var(--sv-border)}
+.sv-btnPrimary{width:auto;min-width:160px}
+.sv-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sv-hr{border:none;border-top:1px solid var(--sv-border);margin:16px 0}
+.sv-item{padding:12px;border:1px solid var(--sv-border);border-radius:var(--sv-item-radius);margin:10px 0;background:var(--sv-card-bg)}
+.sv-itemTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.sv-pill{font-size:12px;color:var(--sv-text);background:var(--sv-pill-bg);padding:6px 10px;border-radius:999px;white-space:nowrap}
+.sv-pillStack{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.sv-pillEdit{background:var(--sv-pill-bg);color:var(--sv-text);border:none;cursor:pointer;font-size:12px;padding:6px 10px;border-radius:999px}
+.sv-notes{margin-top:8px;color:var(--sv-text)}
+.sv-muted{color:var(--sv-muted)}
+.sv-msg{color:#b00020;margin:10px 0 0}
+.sv-wrap h1,.sv-wrap h2,.sv-wrap h3{color:var(--sv-accent)}
+.sv-rpeRow{display:flex;flex-direction:column;gap:6px;margin:12px 0 8px}
+.sv-rpeScale{display:flex;flex-wrap:wrap;gap:6px}
+.sv-rpeBtn{min-width:28px;height:28px;padding:0;border-radius:8px;border:1px solid var(--sv-border);background:var(--sv-input-bg);color:var(--sv-text);font-size:12px;line-height:1;cursor:pointer}
+.sv-rpeBtn.active{background:#111;color:#fff;border-color:#111}
+.sv-dayControls{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+#loginCard .sv-row{margin-bottom:18px}
+
+/* Editing card */
+.sv-item.editing{display:flex;flex-direction:column;gap:10px}
+.sv-pillDelete{background:#e0e0e0;color:#444;border:none;cursor:pointer;font-size:12px;padding:6px 10px;border-radius:999px}
+</style>
+</head>
+<body>
+
+<!-- ============ CONTROLS ============ -->
+<div class="controls">
+  <h1>Sansevaerk Playground</h1>
+
+  <!-- Presets -->
+  <h2>Presets</h2>
+  <div class="presets" id="presets"></div>
+
+  <!-- Theme colors -->
+  <h2>Theme Colors</h2>
+  <div class="ctrl"><label>Background</label><input type="color" data-key="bg"><span class="val" data-val="bg"></span></div>
+  <div class="ctrl"><label>Card BG</label><input type="color" data-key="cardBg"><span class="val" data-val="cardBg"></span></div>
+  <div class="ctrl"><label>Input BG</label><input type="color" data-key="inputBg"><span class="val" data-val="inputBg"></span></div>
+  <div class="ctrl"><label>Text</label><input type="color" data-key="text"><span class="val" data-val="text"></span></div>
+  <div class="ctrl"><label>Muted</label><input type="color" data-key="muted"><span class="val" data-val="muted"></span></div>
+  <div class="ctrl"><label>Accent</label><input type="color" data-key="accent"><span class="val" data-val="accent"></span></div>
+  <div class="ctrl"><label>Border</label><input type="color" data-key="border"><span class="val" data-val="border"></span></div>
+  <div class="ctrl"><label>Pill BG</label><input type="color" data-key="pillBg"><span class="val" data-val="pillBg"></span></div>
+  <div class="ctrl"><label>Button BG</label><input type="color" data-key="btnBg"><span class="val" data-val="btnBg"></span></div>
+  <div class="ctrl"><label>Button Text</label><input type="color" data-key="btnText"><span class="val" data-val="btnText"></span></div>
+
+  <!-- Spacing & Radius -->
+  <h2>Spacing & Radius</h2>
+  <div class="ctrl"><label>Max width</label><input type="range" data-key="maxWidth" min="600" max="1200" step="20"><span class="val" data-val="maxWidth"></span></div>
+  <div class="ctrl"><label>Wrap padding</label><input type="range" data-key="wrapPad" min="8" max="48" step="2"><span class="val" data-val="wrapPad"></span></div>
+  <div class="ctrl"><label>Card padding</label><input type="range" data-key="cardPad" min="8" max="32" step="2"><span class="val" data-val="cardPad"></span></div>
+  <div class="ctrl"><label>Card radius</label><input type="range" data-key="cardRadius" min="0" max="28" step="1"><span class="val" data-val="cardRadius"></span></div>
+  <div class="ctrl"><label>Input padding</label><input type="range" data-key="inputPad" min="4" max="16" step="1"><span class="val" data-val="inputPad"></span></div>
+  <div class="ctrl"><label>Input radius</label><input type="range" data-key="inputRadius" min="0" max="20" step="1"><span class="val" data-val="inputRadius"></span></div>
+  <div class="ctrl"><label>Button radius</label><input type="range" data-key="btnRadius" min="0" max="20" step="1"><span class="val" data-val="btnRadius"></span></div>
+  <div class="ctrl"><label>Item radius</label><input type="range" data-key="itemRadius" min="0" max="20" step="1"><span class="val" data-val="itemRadius"></span></div>
+  <div class="ctrl"><label>Grid gap</label><input type="range" data-key="gridGap" min="4" max="24" step="2"><span class="val" data-val="gridGap"></span></div>
+
+  <!-- Shadow -->
+  <h2>Card Shadow</h2>
+  <div class="ctrl"><label>Offset Y</label><input type="range" data-key="shadowY" min="0" max="20" step="1"><span class="val" data-val="shadowY"></span></div>
+  <div class="ctrl"><label>Blur</label><input type="range" data-key="shadowBlur" min="0" max="40" step="1"><span class="val" data-val="shadowBlur"></span></div>
+  <div class="ctrl"><label>Opacity</label><input type="range" data-key="shadowOpacity" min="0" max="0.4" step="0.01"><span class="val" data-val="shadowOpacity"></span></div>
+
+  <!-- Typography -->
+  <h2>Typography</h2>
+  <div class="ctrl"><label>Font</label>
+    <select data-key="font">
+      <option value="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">System UI</option>
+      <option value="'Inter', sans-serif">Inter</option>
+      <option value="'Georgia', serif">Georgia</option>
+      <option value="'Courier New', monospace">Monospace</option>
+      <option value="'Verdana', sans-serif">Verdana</option>
+    </select>
+  </div>
+
+  <!-- View -->
+  <h2>Preview View</h2>
+  <div class="ctrl"><label>Show section</label>
+    <select data-key="view">
+      <option value="all">Full app</option>
+      <option value="login">Login only</option>
+      <option value="form">Log session</option>
+      <option value="day">Day overview</option>
+      <option value="recent">Recent sessions</option>
+    </select>
+  </div>
+</div>
+
+<!-- ============ RIGHT PANEL ============ -->
+<div class="right">
+  <div class="preview-wrap">
+    <div class="preview-frame" id="previewFrame"></div>
+  </div>
+
+  <div class="prompt-area">
+    <h3>Generated Prompt</h3>
+    <div class="prompt-text" id="promptText"></div>
+    <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy Prompt</button>
+  </div>
+</div>
+
+<script>
+// ======================== DEFAULTS ========================
+const DEFAULTS = {
+  bg: '#0f1115', cardBg: '#171a21', inputBg: '#1f2430',
+  text: '#e6e6e6', muted: '#9aa0a6', accent: '#07c92f',
+  border: '#2a2f3a', pillBg: '#222633',
+  btnBg: '#e6e6e6', btnText: '#111111',
+  maxWidth: 920, wrapPad: 24, cardPad: 16,
+  cardRadius: 14, inputPad: 10, inputRadius: 10,
+  btnRadius: 10, itemRadius: 12, gridGap: 10,
+  shadowY: 6, shadowBlur: 18, shadowOpacity: 0.06,
+  font: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
+  view: 'all'
+};
+
+const PRESETS = {
+  'Current Dark': {
+    bg:'#0f1115',cardBg:'#171a21',inputBg:'#1f2430',text:'#e6e6e6',muted:'#9aa0a6',accent:'#07c92f',border:'#2a2f3a',pillBg:'#222633',btnBg:'#e6e6e6',btnText:'#111111',maxWidth:920,wrapPad:24,cardPad:16,cardRadius:14,inputPad:10,inputRadius:10,btnRadius:10,itemRadius:12,gridGap:10,shadowY:6,shadowBlur:18,shadowOpacity:0.06,font:'system-ui, -apple-system, Segoe UI, Roboto, sans-serif'
+  },
+  'Current Light': {
+    bg:'#f6f7fb',cardBg:'#ffffff',inputBg:'#ffffff',text:'#111111',muted:'#4c4a4a',accent:'#07c92f',border:'#e5e5e5',pillBg:'#f2f3f7',btnBg:'#111111',btnText:'#ffffff',maxWidth:920,wrapPad:24,cardPad:16,cardRadius:14,inputPad:10,inputRadius:10,btnRadius:10,itemRadius:12,gridGap:10,shadowY:6,shadowBlur:18,shadowOpacity:0.06,font:'system-ui, -apple-system, Segoe UI, Roboto, sans-serif'
+  },
+  'Warm Dojo': {
+    bg:'#1a1410',cardBg:'#231d17',inputBg:'#2c241c',text:'#e8ddd0',muted:'#a89882',accent:'#e8943a',border:'#3a3028',pillBg:'#2c261e',btnBg:'#e8943a',btnText:'#1a1410',maxWidth:920,wrapPad:24,cardPad:18,cardRadius:10,inputPad:10,inputRadius:8,btnRadius:8,itemRadius:10,gridGap:10,shadowY:4,shadowBlur:16,shadowOpacity:0.12,font:'system-ui, -apple-system, Segoe UI, Roboto, sans-serif'
+  },
+  'Minimal': {
+    bg:'#ffffff',cardBg:'#fafafa',inputBg:'#ffffff',text:'#222222',muted:'#888888',accent:'#222222',border:'#e0e0e0',pillBg:'#f0f0f0',btnBg:'#222222',btnText:'#ffffff',maxWidth:720,wrapPad:20,cardPad:20,cardRadius:4,inputPad:10,inputRadius:4,btnRadius:4,itemRadius:4,gridGap:12,shadowY:1,shadowBlur:4,shadowOpacity:0.08,font:"'Inter', sans-serif"
+  },
+  'Ocean': {
+    bg:'#0b1628',cardBg:'#0f1e36',inputBg:'#142840',text:'#d0dff0',muted:'#6889aa',accent:'#3ba4ff',border:'#1e3654',pillBg:'#152a44',btnBg:'#3ba4ff',btnText:'#0b1628',maxWidth:920,wrapPad:24,cardPad:18,cardRadius:16,inputPad:10,inputRadius:12,btnRadius:12,itemRadius:14,gridGap:10,shadowY:8,shadowBlur:24,shadowOpacity:0.15,font:'system-ui, -apple-system, Segoe UI, Roboto, sans-serif'
+  }
+};
+
+const state = {...DEFAULTS};
+
+// ======================== PREVIEW HTML ========================
+const loginHTML = `
+<section class="sv-card" id="svLogin">
+  <h2>Login</h2>
+  <div class="sv-row" style="margin-bottom:18px">
+    <input placeholder="brugernavn" autocomplete="off"/>
+    <input type="password" placeholder="password" autocomplete="off"/>
+  </div>
+  <button>Log ind</button>
+</section>`;
+
+const formHTML = `
+<section class="sv-card" id="svForm">
+  <div class="sv-topbar">
+    <h2>Log session</h2>
+    <button class="ghost">Log ud</button>
+  </div>
+  <div class="sv-grid">
+    <label>Date<input type="date" value="2026-02-07"/></label>
+    <label>Activity
+      <select><option>karate</option><option>weights</option><option>run</option><option>rowing</option><option>cardio</option><option>rest</option></select>
+    </label>
+    <label>Duration (min)<input type="number" value="60"/></label>
+    <label>Energy (1-5)
+      <select><option>1</option><option>2</option><option>3</option><option value="4" selected>4</option><option>5</option></select>
+    </label>
+    <label>Emphasis
+      <select><option>technical</option><option>physical</option><option>mixed</option></select>
+    </label>
+    <label class="wide">Notes<input placeholder="Timing off, good snap..."/></label>
+  </div>
+  <button class="sv-btnPrimary">Save session</button>
+</section>`;
+
+const dayHTML = `
+<div id="svDay">
+  <hr class="sv-hr"/>
+  <div class="sv-topbar"><h2>Day overview</h2></div>
+  <div class="sv-dayControls">
+    <input type="date" value="2026-02-07"/>
+    <button class="ghost">View day</button>
+  </div>
+  <div class="sv-item">
+    <div class="sv-itemTop">
+      <div><b>karate</b></div>
+      <div class="sv-pillStack">
+        <div class="sv-pill">60m &middot; E4 &middot; technical</div>
+        <button class="sv-pillEdit">Edit</button>
+      </div>
+    </div>
+    <div class="sv-itemTop">
+      <div class="sv-muted">Effort: RPE 7</div>
+    </div>
+    <div class="sv-notes">Focused on kata timing. Mae-geri snap improving.</div>
+  </div>
+  <div class="sv-item">
+    <div class="sv-itemTop">
+      <div><b>weights</b></div>
+      <div class="sv-pillStack">
+        <div class="sv-pill">45m &middot; E3 &middot; physical</div>
+        <button class="sv-pillEdit">Edit</button>
+      </div>
+    </div>
+    <div class="sv-itemTop">
+      <div class="sv-muted">Effort: RPE 8</div>
+    </div>
+    <div class="sv-notes">Squats 5x5, bench 4x8. Grip felt weak.</div>
+  </div>
+</div>`;
+
+const recentHTML = `
+<div id="svRecent">
+  <hr class="sv-hr"/>
+  <div class="sv-topbar">
+    <h2>Recent sessions</h2>
+    <button class="ghost">Refresh</button>
+  </div>
+  <div class="sv-item">
+    <div class="sv-itemTop">
+      <div><b>2026-02-07</b> &mdash; karate</div>
+      <div class="sv-pillStack">
+        <div class="sv-pill">60m &middot; E4 &middot; technical &middot; RPE 7</div>
+        <button class="sv-pillDelete">Delete</button>
+      </div>
+    </div>
+    <div class="sv-notes">Focused on kata timing. Mae-geri snap improving.</div>
+  </div>
+  <div class="sv-item">
+    <div class="sv-itemTop">
+      <div><b>2026-02-06</b> &mdash; run</div>
+      <div class="sv-pillStack">
+        <div class="sv-pill">35m &middot; E3 &middot; physical &middot; RPE 6</div>
+        <button class="sv-pillDelete">Delete</button>
+      </div>
+    </div>
+    <div class="sv-notes"><span class="sv-muted">No notes</span></div>
+  </div>
+  <div class="sv-item">
+    <div class="sv-itemTop">
+      <div><b>2026-02-05</b> &mdash; rowing</div>
+      <div class="sv-pillStack">
+        <div class="sv-pill">30m &middot; E4 &middot; physical</div>
+        <button class="sv-pillDelete">Delete</button>
+      </div>
+    </div>
+    <div class="sv-notes">Steady state 5k. Kept stroke rate at 22.</div>
+  </div>
+</div>`;
+
+// ======================== INIT ========================
+function initControls() {
+  // Bind all inputs
+  document.querySelectorAll('.ctrl input[data-key], .ctrl select[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    el.addEventListener('input', () => {
+      if (el.type === 'range') state[key] = parseFloat(el.value);
+      else state[key] = el.value;
+      updateAll();
+    });
+  });
+
+  // Build presets
+  const presetsEl = document.getElementById('presets');
+  Object.keys(PRESETS).forEach(name => {
+    const btn = document.createElement('button');
+    btn.textContent = name;
+    btn.onclick = () => applyPreset(name);
+    presetsEl.appendChild(btn);
+  });
+
+  syncControlsToState();
+  updateAll();
+}
+
+function syncControlsToState() {
+  document.querySelectorAll('.ctrl input[data-key], .ctrl select[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (state[key] !== undefined) el.value = state[key];
+  });
+}
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  Object.assign(state, p);
+  state.view = state.view || 'all';
+  syncControlsToState();
+  updateAll();
+
+  // Highlight active preset
+  document.querySelectorAll('.presets button').forEach(b => {
+    b.classList.toggle('active', b.textContent === name);
+  });
+}
+
+// ======================== UPDATE ========================
+function updateAll() {
+  renderPreview();
+  updatePrompt();
+  updateValues();
+}
+
+function updateValues() {
+  document.querySelectorAll('.val[data-val]').forEach(el => {
+    const key = el.dataset.val;
+    const v = state[key];
+    if (typeof v === 'number') {
+      el.textContent = Number.isInteger(v) ? v + 'px' : v.toFixed(2);
+    } else {
+      el.textContent = v;
+    }
+  });
+}
+
+function renderPreview() {
+  const frame = document.getElementById('previewFrame');
+
+  // Build sections based on view
+  let sections = '';
+  if (state.view === 'all' || state.view === 'login') sections += loginHTML;
+  if (state.view === 'all' || state.view === 'form') sections += formHTML;
+  if (state.view === 'all' || state.view === 'day') sections += dayHTML;
+  if (state.view === 'all' || state.view === 'recent') sections += recentHTML;
+
+  frame.innerHTML = `<div class="sv-wrap"><div class="sv-header"><h1>Karate Training Journal</h1><div class="sv-headerRow"><p class="sv-sub">Daily notes. Reflections. Improvements</p></div></div>${sections}</div>`;
+
+  // Apply CSS variables
+  const wrap = frame.querySelector('.sv-wrap');
+  wrap.style.setProperty('--sv-card-bg', state.cardBg);
+  wrap.style.setProperty('--sv-input-bg', state.inputBg);
+  wrap.style.setProperty('--sv-text', state.text);
+  wrap.style.setProperty('--sv-muted', state.muted);
+  wrap.style.setProperty('--sv-accent', state.accent);
+  wrap.style.setProperty('--sv-border', state.border);
+  wrap.style.setProperty('--sv-pill-bg', state.pillBg);
+  wrap.style.setProperty('--sv-btn-bg', state.btnBg);
+  wrap.style.setProperty('--sv-btn-text', state.btnText);
+  wrap.style.setProperty('--sv-font', state.font);
+  wrap.style.setProperty('--sv-card-radius', state.cardRadius + 'px');
+  wrap.style.setProperty('--sv-card-padding', state.cardPad + 'px');
+  wrap.style.setProperty('--sv-input-padding', state.inputPad + 'px 12px');
+  wrap.style.setProperty('--sv-input-radius', state.inputRadius + 'px');
+  wrap.style.setProperty('--sv-btn-radius', state.btnRadius + 'px');
+  wrap.style.setProperty('--sv-item-radius', state.itemRadius + 'px');
+  wrap.style.setProperty('--sv-grid-gap', state.gridGap + 'px');
+  wrap.style.setProperty('--sv-shadow', `0 ${state.shadowY}px ${state.shadowBlur}px rgba(0,0,0,${state.shadowOpacity})`);
+
+  // Outer frame styles
+  frame.style.maxWidth = state.maxWidth + 'px';
+  frame.parentElement.style.background = state.bg;
+  wrap.style.padding = state.wrapPad + 'px';
+  wrap.style.color = state.text;
+}
+
+// ======================== PROMPT ========================
+function updatePrompt() {
+  const D = DEFAULTS;
+  const parts = [];
+
+  // Colors
+  const colorChanges = [];
+  if (state.bg !== D.bg) colorChanges.push(`background: ${state.bg}`);
+  if (state.cardBg !== D.cardBg) colorChanges.push(`card background: ${state.cardBg}`);
+  if (state.inputBg !== D.inputBg) colorChanges.push(`input background: ${state.inputBg}`);
+  if (state.text !== D.text) colorChanges.push(`text: ${state.text}`);
+  if (state.muted !== D.muted) colorChanges.push(`muted text: ${state.muted}`);
+  if (state.accent !== D.accent) colorChanges.push(`accent/heading color: ${state.accent}`);
+  if (state.border !== D.border) colorChanges.push(`borders: ${state.border}`);
+  if (state.pillBg !== D.pillBg) colorChanges.push(`pill background: ${state.pillBg}`);
+  if (state.btnBg !== D.btnBg) colorChanges.push(`button background: ${state.btnBg}`);
+  if (state.btnText !== D.btnText) colorChanges.push(`button text: ${state.btnText}`);
+  if (colorChanges.length) parts.push('Update the color scheme: ' + colorChanges.join(', ') + '.');
+
+  // Spacing
+  const spaceChanges = [];
+  if (state.maxWidth !== D.maxWidth) spaceChanges.push(`max-width to ${state.maxWidth}px`);
+  if (state.wrapPad !== D.wrapPad) spaceChanges.push(`outer padding to ${state.wrapPad}px`);
+  if (state.cardPad !== D.cardPad) spaceChanges.push(`card padding to ${state.cardPad}px`);
+  if (state.gridGap !== D.gridGap) spaceChanges.push(`form grid gap to ${state.gridGap}px`);
+  if (spaceChanges.length) parts.push('Adjust spacing: ' + spaceChanges.join(', ') + '.');
+
+  // Radius
+  const radiusChanges = [];
+  if (state.cardRadius !== D.cardRadius) radiusChanges.push(`cards to ${state.cardRadius}px`);
+  if (state.inputRadius !== D.inputRadius) radiusChanges.push(`inputs to ${state.inputRadius}px`);
+  if (state.btnRadius !== D.btnRadius) radiusChanges.push(`buttons to ${state.btnRadius}px`);
+  if (state.itemRadius !== D.itemRadius) radiusChanges.push(`session items to ${state.itemRadius}px`);
+  if (state.inputPad !== D.inputPad) radiusChanges.push(`input padding to ${state.inputPad}px`);
+  if (radiusChanges.length) parts.push('Change border-radius: ' + radiusChanges.join(', ') + '.');
+
+  // Shadow
+  if (state.shadowY !== D.shadowY || state.shadowBlur !== D.shadowBlur || state.shadowOpacity !== D.shadowOpacity) {
+    if (state.shadowOpacity === 0) {
+      parts.push('Remove the card shadow entirely.');
+    } else {
+      const intensity = state.shadowBlur > 24 ? 'pronounced' : state.shadowBlur > 10 ? 'medium' : 'subtle';
+      parts.push(`Use a ${intensity} card shadow: 0 ${state.shadowY}px ${state.shadowBlur}px rgba(0,0,0,${state.shadowOpacity.toFixed(2)}).`);
+    }
+  }
+
+  // Font
+  if (state.font !== D.font) {
+    const shortName = state.font.split(',')[0].replace(/'/g, '').trim();
+    parts.push(`Switch the font to ${shortName}.`);
+  }
+
+  const promptEl = document.getElementById('promptText');
+  if (parts.length === 0) {
+    promptEl.textContent = 'No changes from defaults. Adjust controls to generate a prompt.';
+  } else {
+    promptEl.textContent = 'Update the Sansevaerk frontend styles.css with these changes:\n\n' + parts.join('\n\n');
+  }
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Prompt';
+      btn.classList.remove('copied');
+    }, 1500);
+  });
+}
+
+// ======================== BOOT ========================
+initControls();
+applyPreset('Current Dark');
+</script>
+</body>
+</html>

@@ -15,9 +15,12 @@
 
       <div class="headerRow">
         <p class="sub">Daily notes. Reflections. Improvements</p>
-        <button type="button" class="ghost themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-          🌓
-        </button>
+        <select class="themeSelect" id="themeSelect" onchange="setTheme(this.value)" aria-label="Theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="warm-dojo">Warm Dojo</option>
+          <option value="classic-95">Classic 95</option>
+        </select>
       </div>
     </header>
 

@@ -39,15 +39,21 @@ header {
   gap: 12px;
 }
 
-.themeToggle {
+.themeSelect {
   padding: 6px 10px;
-  font-size: 16px;
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  width: auto;
 }
 
 
 .sub {
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--text);
 }
 
 /* darkmode */
@@ -57,10 +63,13 @@ header {
   --input-bg: #ffffff;
   --text: #111;
   --muted: #4c4a4a;
+  --accent: #111;
   --border: #e5e5e5;
   --pill-bg: #f2f3f7;
   --btn-bg: #111;
   --btn-text: #fff;
+  --pill-delete-bg: #e0e0e0;
+  --pill-delete-text: #444;
 }
 
 h1,
@@ -112,19 +121,6 @@ h3 {
    Inputs — let the browser handle height
    ===================================================== */
 
-/* input,
-select,
-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  font-size: 14px;
-  line-height: 1.4;
-  appearance: none;
-  -webkit-appearance: none;
-} */
-
 input,
 select,
 textarea {
@@ -140,6 +136,13 @@ textarea {
 
 ::placeholder {
   color: var(--muted);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 
@@ -178,9 +181,8 @@ button.ghost {
 
 /* Delete pill inherits .pill styles */
 .pillDelete {
-  background: #e0e0e0;
-  /* darker than summary pill */
-  color: #444;
+  background: var(--pill-delete-bg);
+  color: var(--pill-delete-text);
   border: none;
   cursor: pointer;
 }
@@ -291,9 +293,9 @@ hr {
 }
 
 .rpeBtn.active {
-  background: #111;
-  color: #fff;
-  border-color: #111;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border-color: var(--btn-bg);
 }
 
 /* =========================================
@@ -383,6 +385,8 @@ button:focus-visible {
   --pill-bg: #222633;
   --btn-bg: #e6e6e6;
   --btn-text: #111;
+  --pill-delete-bg: #2a2f3a;
+  --pill-delete-text: #e6e6e6;
 }
 
 [data-theme="dark"] .muted {
@@ -392,4 +396,138 @@ button:focus-visible {
 [data-theme="dark"] button.ghost {
   color: var(--text);
   border-color: var(--border);
+}
+
+/* =====================================================
+   Warm Dojo — Win95 retro with warm brown/orange
+   ===================================================== */
+
+[data-theme="warm-dojo"] {
+  --bg: #1a1410;
+  --card-bg: #231d17;
+  --input-bg: #1a1410;
+  --text: #e8ddd0;
+  --muted: #a89882;
+  --accent: #e8943a;
+  --border: #3a3028;
+  --pill-bg: #2c261e;
+  --btn-bg: #2c241c;
+  --btn-text: #e8ddd0;
+  --hi: #5a4a38;
+  --pill-delete-bg: #3a3028;
+  --pill-delete-text: #e8ddd0;
+}
+
+/* =====================================================
+   Classic 95 — authentic Win95 gray/teal
+   ===================================================== */
+
+[data-theme="classic-95"] {
+  --bg: #008080;
+  --card-bg: #c0c0c0;
+  --input-bg: #ffffff;
+  --text: #000000;
+  --muted: #808080;
+  --accent: #000080;
+  --border: #808080;
+  --pill-bg: #dfdfdf;
+  --btn-bg: #c0c0c0;
+  --btn-text: #000000;
+  --hi: #dfdfdf;
+  --pill-delete-bg: #c0c0c0;
+  --pill-delete-text: #000000;
+}
+
+/* =====================================================
+   Shared Win95 structural overrides
+   ===================================================== */
+
+[data-theme="warm-dojo"] .card,
+[data-theme="classic-95"] .card {
+  border-radius: 0;
+  box-shadow: none;
+  border: 2px outset var(--hi);
+}
+
+[data-theme="warm-dojo"] input,
+[data-theme="warm-dojo"] select,
+[data-theme="warm-dojo"] textarea,
+[data-theme="classic-95"] input,
+[data-theme="classic-95"] select,
+[data-theme="classic-95"] textarea {
+  border-radius: 0;
+  border: 2px inset var(--hi);
+}
+
+[data-theme="warm-dojo"] input:focus,
+[data-theme="warm-dojo"] select:focus,
+[data-theme="warm-dojo"] textarea:focus,
+[data-theme="classic-95"] input:focus,
+[data-theme="classic-95"] select:focus,
+[data-theme="classic-95"] textarea:focus {
+  border-color: var(--accent);
+}
+
+[data-theme="warm-dojo"] button,
+[data-theme="classic-95"] button {
+  border-radius: 0;
+  border: 2px outset var(--hi);
+}
+
+[data-theme="warm-dojo"] button:active,
+[data-theme="classic-95"] button:active {
+  border-style: inset;
+  transform: none;
+}
+
+[data-theme="warm-dojo"] button.ghost,
+[data-theme="classic-95"] button.ghost {
+  border: 2px outset var(--hi);
+  color: var(--text);
+}
+
+[data-theme="warm-dojo"] .item,
+[data-theme="classic-95"] .item {
+  border-radius: 0;
+  border: 2px groove var(--hi);
+}
+
+[data-theme="warm-dojo"] .pill,
+[data-theme="classic-95"] .pill {
+  border-radius: 0;
+}
+
+[data-theme="warm-dojo"] .rpeBtn,
+[data-theme="classic-95"] .rpeBtn {
+  border-radius: 0;
+  border: 2px outset var(--hi);
+}
+
+[data-theme="warm-dojo"] .rpeBtn:hover {
+  background: #3a3028;
+}
+
+[data-theme="classic-95"] .rpeBtn:hover {
+  background: #dfdfdf;
+}
+
+[data-theme="warm-dojo"] hr,
+[data-theme="classic-95"] hr {
+  border-top: 2px groove var(--hi);
+}
+
+[data-theme="warm-dojo"] button:focus-visible,
+[data-theme="classic-95"] button:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+[data-theme="warm-dojo"] button.ghost:active,
+[data-theme="classic-95"] button.ghost:active {
+  background: var(--pill-bg);
+}
+
+[data-theme="warm-dojo"] .btnPrimary,
+[data-theme="classic-95"] .btnPrimary {
+  background: var(--accent);
+  color: #fff;
 }

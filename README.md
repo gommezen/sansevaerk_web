@@ -51,9 +51,11 @@ See `public_html/api/` for endpoint implementations and parameter definitions.
 - Authenticated, session-based API
 - Create, edit, and soft-delete training sessions
 - Day-based and recent session views
+- RPE (Rate of Perceived Exertion) tracking per session
 - UUID-based session identities
-- Incremental offline/online sync
-- Mobile-first UI model
+- Incremental sync endpoint for external clients
+- Responsive UI designed for mobile logging
+- Four themes: Light, Dark, Warm Dojo (Win95 retro), Classic 95
 
 ## Architecture & Design Principles
 

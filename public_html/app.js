@@ -32,15 +32,20 @@ function uuidv4() {
 
 const el = (id) => document.getElementById(id);
 
-// darkmode
 (function initTheme() {
+  const validThemes = ["light", "dark", "warm-dojo", "classic-95"];
   const saved = localStorage.getItem("theme");
-  if (saved) {
-    document.documentElement.dataset.theme = saved;
+  let theme;
+
+  if (saved && validThemes.includes(saved)) {
+    theme = saved;
   } else {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.dataset.theme = prefersDark ? "dark" : "light";
+    theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
+
+  document.documentElement.dataset.theme = theme;
+  const sel = document.getElementById("themeSelect");
+  if (sel) sel.value = theme;
 })();
 
 
@@ -435,11 +440,7 @@ el("btnDayView").onclick = loadDayView;
   }
 })();
 
-function toggleTheme() {
-  const root = document.documentElement;
-  const current = root.dataset.theme || "light";
-  const next = current === "dark" ? "light" : "dark";
-
-  root.dataset.theme = next;
-  localStorage.setItem("theme", next);
+function setTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("theme", theme);
 }
