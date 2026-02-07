@@ -27,6 +27,8 @@ Thumbs.db
 
 .vscode/
 .idea/
+.claude/
+CLAUDE.md
 
 # ----------------------------------------------------------------------
 # Backup / accidental files

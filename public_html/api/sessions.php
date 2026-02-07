@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     // 2) Incremental sync (Streamlit)
-    if ($since !== '' && is_iso_date) {
+    if ($since !== '' && is_iso_date($since)) {
         $stmt = $db->prepare("
             SELECT
               id, session_date, activity_type, duration_minutes,
