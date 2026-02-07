@@ -244,7 +244,7 @@ function renderEditCard(x) {
 }
 
 function activityOptions(selected) {
-  const activities = ["karate", "row", "run", "weights", "cardio", "rest"];
+  const activities = ["karate", "rowing", "run", "weights", "cardio", "rest"];
   return activities.map(a =>
     `<option value="${a}" ${a === selected ? "selected" : ""}>${a}</option>`
   ).join("");
@@ -377,7 +377,7 @@ el("btnLogin").onclick = async () => {
     el("date").value = new Date().toISOString().slice(0, 10);
     await refresh();
   } catch {
-    el("loginMsg").textContent = "Login fejlede.";
+    el("loginMsg").textContent = "Login failed.";
   }
 };
 
