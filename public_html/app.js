@@ -283,6 +283,29 @@ function rpeOptions(selected) {
   }).join("");
 }
 
+function initLogRpe() {
+  const scale = el("logRpeScale");
+  if (!scale) return;
+  scale.innerHTML = rpeOptions(null);
+  scale.querySelectorAll(".rpeBtn").forEach(btn => {
+    btn.onclick = () => {
+      const wasActive = btn.classList.contains("active");
+      scale.querySelectorAll(".rpeBtn").forEach(b => b.classList.remove("active"));
+      if (!wasActive) btn.classList.add("active");
+    };
+  });
+}
+
+function getLogRpe() {
+  const active = document.querySelector("#logRpeScale .rpeBtn.active");
+  return active ? Number(active.dataset.rpe) : null;
+}
+
+function resetLogRpe() {
+  const scale = el("logRpeScale");
+  if (scale) scale.querySelectorAll(".rpeBtn").forEach(b => b.classList.remove("active"));
+}
+
 
 /* --------------------------------------------------
    Recent list (unchanged, delete-only)
@@ -380,6 +403,7 @@ el("btnLogin").onclick = async () => {
     });
     showApp(true);
     el("date").value = new Date().toISOString().slice(0, 10);
+    initLogRpe();
     await refresh();
   } catch {
     el("loginMsg").textContent = "Login failed.";
@@ -410,6 +434,7 @@ el("btnSave").onclick = async () => {
     duration_minutes: Number(el("duration").value),
     energy_level: Number(el("energy").value),
     session_emphasis: el("emphasis").value,
+    rpe: getLogRpe(),
     notes: el("notes").value || null
   };
 
@@ -417,6 +442,7 @@ el("btnSave").onclick = async () => {
     await api("/api/sessions.php", { method: "POST", body: JSON.stringify(payload) });
     el("saveMsg").textContent = "Saved ✅";
     el("notes").value = "";
+    resetLogRpe();
     await refresh();
     await loadDayView();
   } catch {
@@ -435,6 +461,7 @@ el("btnDayView").onclick = loadDayView;
     const today = new Date().toISOString().slice(0, 10);
     el("date").value = today;
     el("dayDate").value = today;
+    initLogRpe();
     await refresh();
     await loadDayView();
   }
