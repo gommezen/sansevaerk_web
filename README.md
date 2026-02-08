@@ -2,7 +2,7 @@
 
 Sansevaerk is a minimal, single-user personal training journal (PHP + simple frontend) focused on daily logging, reliable offline/online synchronization, and long-term data continuity.
 
-![Screenshot — Warm Dojo theme](screenshot.png)
+![Screenshot — Warm Dojo theme](docs/screenshot.png)
 
 ## Quick Start
 
