@@ -1,6 +1,12 @@
 # sansevaerk
 
-Sansevaerk is a minimal, single-user personal training journal (PHP + simple frontend) focused on daily logging, reliable offline/online synchronization, and long-term data continuity.
+[![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![MySQL](https://img.shields.io/badge/MySQL%2FMariaDB-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![License](https://img.shields.io/github/license/gommezen/sansevaerk_web)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/gommezen/sansevaerk_web)](https://github.com/gommezen/sansevaerk_web/commits/main)
+
+Sansevaerk is a minimal, single-user personal training journal (PHP + vanilla JS) focused on daily logging, reliable offline/online synchronization, and long-term data continuity.
 
 ![Screenshot — Warm Dojo theme](docs/Screenshot.png)
 
