@@ -479,3 +479,5 @@ function setTheme(theme) {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem("theme", theme);
 }
+
+el("themeSelect").onchange = function () { setTheme(this.value); };
