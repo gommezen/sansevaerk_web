@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_emphasis=VALUES(session_emphasis),
             rpe=VALUES(rpe),
             notes=VALUES(notes),
-            deleted=0,
+            deleted=GREATEST(deleted, VALUES(deleted)),
             updated_at=CURRENT_TIMESTAMP
         ");
 
