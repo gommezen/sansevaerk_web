@@ -18,5 +18,6 @@ require __DIR__ . '/_common.php';
 require_auth();
 
 respond([
-    'ok' => true
+    'ok' => true,
+    'csrf_token' => csrf_token()
 ]);

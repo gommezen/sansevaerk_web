@@ -1,9 +1,15 @@
 let editingUuid = null;
+let csrfToken = null;
 
 async function api(path, opts = {}) {
+  const headers = { "Content-Type": "application/json" };
+  const method = (opts.method || "GET").toUpperCase();
+  if (csrfToken && method !== "GET") {
+    headers["X-CSRF-Token"] = csrfToken;
+  }
   const res = await fetch(path, {
     credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...opts
   });
   const text = await res.text();
@@ -15,7 +21,8 @@ async function api(path, opts = {}) {
 
 async function verifyAuth() {
   try {
-    await api("/api/me.php");
+    const data = await api("/api/me.php");
+    if (data.csrf_token) csrfToken = data.csrf_token;
     return true;
   } catch {
     return false;
@@ -402,6 +409,7 @@ el("btnLogin").onclick = async () => {
       })
     });
     showApp(true);
+    await verifyAuth();
     el("date").value = new Date().toISOString().slice(0, 10);
     initLogRpe();
     await refresh();

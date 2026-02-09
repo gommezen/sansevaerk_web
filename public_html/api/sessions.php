@@ -18,6 +18,10 @@ require __DIR__ . '/_common.php';
 
 require_auth();
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    require_csrf();
+}
+
 $db = pdo();
 
 /* ----------------------------------------------------------------------

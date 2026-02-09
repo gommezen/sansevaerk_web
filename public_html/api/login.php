@@ -18,7 +18,13 @@ if ($user === '' || $pass === '') {
     respond(['error' => 'missing credentials'], 400);
 }
 
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (!check_rate_limit($ip)) {
+    respond(['error' => 'too many attempts, try again later'], 429);
+}
+
 if ($user !== APP_USER || !password_verify($pass, APP_PASS_HASH)) {
+    record_failed_attempt($ip);
     respond(['error' => 'invalid credentials'], 401);
 }
 

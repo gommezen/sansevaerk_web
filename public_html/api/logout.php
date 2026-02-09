@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/_common.php';
 
+require_csrf();
+
 /**
  * Clear session array
  */

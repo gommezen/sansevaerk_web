@@ -79,6 +79,68 @@ function require_auth(): void
     }
 }
 
+function csrf_token(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function require_csrf(): void
+{
+    $header = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if ($header === '' || !hash_equals(csrf_token(), $header)) {
+        respond(['error' => 'CSRF token mismatch'], 403);
+    }
+}
+
+/* ----------------------------------------------------------------------
+   Rate limiting (file-based)
+   ---------------------------------------------------------------------- */
+
+function rate_limit_path(): string
+{
+    $dir = __DIR__ . '/../../private_journal/rate_limits';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0700, true);
+    }
+    return $dir;
+}
+
+function check_rate_limit(string $key, int $max = 5, int $window = 900): bool
+{
+    $file = rate_limit_path() . '/' . md5($key) . '.json';
+    if (!file_exists($file)) return true;
+
+    $data = json_decode(file_get_contents($file), true);
+    if (!is_array($data)) return true;
+
+    $cutoff = time() - $window;
+    $recent = array_filter($data, fn(int $ts) => $ts > $cutoff);
+
+    return count($recent) < $max;
+}
+
+function record_failed_attempt(string $key): void
+{
+    $file = rate_limit_path() . '/' . md5($key) . '.json';
+    $data = [];
+
+    if (file_exists($file)) {
+        $data = json_decode(file_get_contents($file), true);
+        if (!is_array($data)) $data = [];
+    }
+
+    $data[] = time();
+
+    // Keep only last 15 minutes
+    $cutoff = time() - 900;
+    $data = array_values(array_filter($data, fn(int $ts) => $ts > $cutoff));
+
+    file_put_contents($file, json_encode($data), LOCK_EX);
+}
+
 /* ----------------------------------------------------------------------
    Database (PDO singleton)
    ---------------------------------------------------------------------- */

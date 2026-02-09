@@ -4,6 +4,7 @@
 
 # Real configuration with credentials
 private_journal/config.php
+private_journal/rate_limits/
 
 # Environment variables (if introduced later)
 .env
