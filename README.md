@@ -24,7 +24,13 @@ Copy-Item private_journal\config.example.php private_journal\config.php
 # Edit private_journal/config.php and set DB and secret values
 ```
 
-2. Start a development server:
+2. Create the database table:
+
+```bash
+mysql -u <user> -p <dbname> < schema.sql
+```
+
+3. Start a development server:
 
 ```bash
 php -S localhost:8000 -t public_html

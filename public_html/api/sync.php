@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require __DIR__ . '/_common.php';
 
 $token = $_SERVER['HTTP_X_SYNC_TOKEN'] ?? '';
