@@ -87,6 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        -------------------------------------------------- */
 
     if (isset($b['items']) && is_array($b['items'])) {
+        if (count($b['items']) > 100) {
+            respond(['error' => 'batch limited to 100 items'], 400);
+        }
+
         $stmt = $db->prepare("
             INSERT INTO training_sessions
             (session_date, activity_type, duration_minutes, energy_level,

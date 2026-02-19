@@ -44,6 +44,16 @@ session_start();
 
 require_once __DIR__ . '/../../private_journal/config.php';
 
+// Session idle timeout (default 24 hours, configurable via SESSION_TIMEOUT)
+// Runs after config.php so the constant is available
+$sessionTimeout = defined('SESSION_TIMEOUT') ? SESSION_TIMEOUT : 86400;
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $sessionTimeout) {
+    session_unset();
+    session_destroy();
+    session_start();
+}
+$_SESSION['last_activity'] = time();
+
 /* ----------------------------------------------------------------------
    Request / response helpers
    ---------------------------------------------------------------------- */
@@ -158,15 +168,20 @@ function pdo(): PDO
         DB_NAME
     );
 
-    $pdo = new PDO(
-        $dsn,
-        DB_USER,
-        DB_PASS,
-        [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]
-    );
+    try {
+        $pdo = new PDO(
+            $dsn,
+            DB_USER,
+            DB_PASS,
+            [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]
+        );
+    } catch (PDOException $e) {
+        error_log('DB connection failed: ' . $e->getMessage());
+        respond(['error' => 'database unavailable'], 503);
+    }
 
     return $pdo;
 }

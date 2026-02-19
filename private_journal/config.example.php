@@ -31,3 +31,10 @@ define('APP_PASS_HASH', '$2y$10$exampleexampleexampleexampleexample');
 
 // Shared secret for Streamlit / API sync
 define('SYNC_TOKEN', 'replace-with-long-random-string');
+
+/* ----------------------------------------------------------------------
+   Session settings (optional)
+   ---------------------------------------------------------------------- */
+
+// Session idle timeout in seconds (default: 86400 = 24 hours)
+// define('SESSION_TIMEOUT', 86400);

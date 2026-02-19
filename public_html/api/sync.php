@@ -8,6 +8,11 @@ if (!hash_equals(SYNC_TOKEN, $token)) {
   respond(['error' => 'unauthorized'], 401);
 }
 
+// Rate limit: 60 requests per 15 minutes
+if (!check_rate_limit('sync:' . md5($token), 60, 900)) {
+  respond(['error' => 'rate limit exceeded'], 429);
+}
+
 $db = pdo();
 
 /* ----------------------------------------------------------------------
@@ -18,6 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $b = json_body();
   if (!isset($b['items']) || !is_array($b['items'])) {
     respond(['error' => 'no items'], 400);
+  }
+  if (count($b['items']) > 100) {
+    respond(['error' => 'batch limited to 100 items'], 400);
   }
 
   $stmt = $db->prepare("
