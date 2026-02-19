@@ -31,6 +31,9 @@ if ($user !== APP_USER || !password_verify($pass, APP_PASS_HASH)) {
 // Prevent session fixation
 session_regenerate_id(true);
 
+// Force new CSRF token for the authenticated session
+unset($_SESSION['csrf_token']);
+
 // Mark session as authenticated
 $_SESSION['auth'] = true;
 $_SESSION['user'] = $user;

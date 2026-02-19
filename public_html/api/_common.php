@@ -29,11 +29,10 @@ $cookieParams = [
     'secure'   => $isHttps,
 ];
 
-// Only set SameSite=None when:
-// - PHP supports it
-// - HTTPS is active
-if (PHP_VERSION_ID >= 70300 && $isHttps) {
-    $cookieParams['samesite'] = 'None';
+// SameSite=Lax: correct for same-origin apps. Blocks cross-site POST
+// requests while allowing normal navigation. Works on HTTP and HTTPS.
+if (PHP_VERSION_ID >= 70300) {
+    $cookieParams['samesite'] = 'Lax';
 }
 
 session_set_cookie_params($cookieParams);

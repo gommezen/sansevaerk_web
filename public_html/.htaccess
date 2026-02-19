@@ -12,7 +12,11 @@
   Require all denied
 </FilesMatch>
 
-# Prevent caching of API responses
+# Custom error pages (prevent server metadata leakage)
+ErrorDocument 403 /error/403.html
+ErrorDocument 404 /error/404.html
+
+# Security and cache headers
 <IfModule mod_headers.c>
   Header set Cache-Control "no-store"
   Header set X-Frame-Options "DENY"
@@ -20,4 +24,6 @@
   Header set Referrer-Policy "strict-origin-when-cross-origin"
   Header set X-XSS-Protection "1; mode=block"
   Header set Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https://img.shields.io"
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>
